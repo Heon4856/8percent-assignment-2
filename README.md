@@ -20,6 +20,9 @@
 
 **✔️ API 목록**
 
+**POSTMAN Documentation**
+https://www.postman.com/binooooo/workspace/1aa44ed7-4d2d-4563-ae5d-c1df4ba97e72/documentation/14665666-ed8f4018-6736-4c14-b60a-4af46f3fcb55
+
 ---
 
 - 거래내역 조회 API
