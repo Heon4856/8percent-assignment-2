@@ -5,7 +5,7 @@ from jwt.exceptions import InvalidSignatureError, DecodeError
 from django.http import JsonResponse
 
 from users.models import Users
-from eight_percent.settings import SECRET_KEY, HASHING_ALGORITHM
+from my_settings import SECRET_KEY, HASHING_ALGORITHM
 
 
 def auth_check(func):
