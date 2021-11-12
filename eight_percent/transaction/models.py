@@ -6,6 +6,7 @@ from users.models import Users
 class Account(models.Model):
     number = models.CharField(max_length=30)
     password = models.CharField(max_length=100)
+
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     user = models.ForeignKey('users.Users', on_delete=models.CASCADE)
 
