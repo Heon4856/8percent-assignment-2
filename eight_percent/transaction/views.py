@@ -12,9 +12,11 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 
 from .models import Account, Transaction, TransactionType
+from utils.decorators import auth_check
 
 
 class TransactionHistoryView(View):
+    @auth_check
     def get(self, request):
         data = json.loads(request.body)
         page = request.GET.get('page', 1)
@@ -41,7 +43,7 @@ class TransactionHistoryView(View):
 
 class CreateAccountView(View):
     # 유저 계좌번호 생성
-    # @login_decorator
+    @auth_check
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
@@ -53,12 +55,12 @@ class CreateAccountView(View):
                 return JsonResponse({'message': 'ENTER_YOUR_PASSWORD'}, status=400)
 
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
+            # hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
 
             Account.objects.create(
-                user=user,
-                password=hashed_password,
-                number=hashed_account_number,
+                user     = user,
+                password = hashed_password,
+                number   = account_number,
             )
             return JsonResponse({'message': 'SUCCESS'}, status=200)
 
@@ -68,12 +70,12 @@ class CreateAccountView(View):
 
 class LookupAccountView(View):
     # 유저가 가지고 있는 계좌번호만 조회
-    # @login_decorator
+    @auth_check
     def get(self, request, *args, **kwargs):
         try:
             user = request.user
-            accounts = Account.objects.get(user_id=user)
-            account_list = [accounts.number for number in accounts]
+            accounts = Account.objects.filter(user_id=user)
+            account_list = [item.number for item in accounts]
             return JsonResponse({'account_list': account_list}, status=200)
 
         except JSONDecodeError:
@@ -81,7 +83,7 @@ class LookupAccountView(View):
 
 
 class TransactionView(View):
-    # @login_decorator
+    @auth_check
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
