@@ -54,9 +54,9 @@ class CreateAccountView(View):
             if not password:
                 return JsonResponse({'message': 'ENTER_YOUR_PASSWORD'}, status=400)
 
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
             # hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
-
+            print(hashed_password)
             Account.objects.create(
                 user     = user,
                 password = hashed_password,
@@ -95,11 +95,10 @@ class TransactionView(View):
             counterparty = data['counterparty']
             transaction_type_id = data['transaction_type_id']
 
-            hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
-            print(hashed_account_number)
-            # hash_account_number = bcrypt.checkpw(account_number.encode('utf-8'))
-            account = Account.objects.get(user=user, account_number=account_number)
+            account = Account.objects.get(user=user, number=account_number)
 
+            if not bcrypt.checkpw(account_password.encode('utf-8'), account.password.encode('utf-8')):
+                return JsonResponse({'message': 'INVALID_YOUR_PASSWORD'})
             if not account_number:
                 return JsonResponse({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'}, status=400)
             if not amount or amount < 0:
@@ -138,7 +137,7 @@ class TransactionView(View):
                     account.balance = account.balance - amount
                     account.save()
 
-                return JsonResponse({'message': 'SUCCESS'}, status=200)
+                return JsonResponse({'message': 'SUCCESS', "balance": account.balance}, status=200)
 
         except JSONDecodeError:
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
