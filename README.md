@@ -93,7 +93,7 @@
 
 
 ## 폴더 구조
-
+```
 📦8percent-assignment-2
  ┃ ┣ 📜.gitignore
  ┣ 📂eight_percent
@@ -124,6 +124,7 @@
  ┣ 📜README.md
  ┣ 📜manage.py
  ┗ 📜requirements.txt
+ ```
 
 
 
