@@ -22,6 +22,7 @@ class TransactionHistoryView(View):
     def get(self, request):
         data = json.loads(request.body)
         page = request.GET.get('page', 1)
+        user = request.user
         account_number = data['account_number']
         transaction_type = data['transaction_type']
         start_date = date.fromisoformat(data['start_date'])
@@ -30,9 +31,10 @@ class TransactionHistoryView(View):
 
         start_id = int(start_date.strftime("%Y%m%d")) * 1000000000
         end_id = int(end_date.strftime("%Y%m%d")) * 1000000000
+        account_id = Account.objects.get(user=user, number=account_number)
 
         transaction = Transaction.objects.filter(
-            Q(account_id=account_number) & Q(transaction_type=transaction_type) & Q(
+            Q(account_id=account_id) & Q(transaction_type=transaction_type) & Q(
                 id__range=[start_id, end_id])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         print(len(paginated_transaction))
