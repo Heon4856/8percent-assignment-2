@@ -94,5 +94,38 @@
 
 ## 폴더 구조
 
+📦8percent-assignment-2
+ ┃ ┣ 📜.gitignore
+ ┣ 📂eight_percent
+ ┃ ┣ 📂migrations
+ ┃ ┣ 📜__init__.py
+ ┃ ┣ 📜asgi.py
+ ┃ ┣ 📜settings.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜wsgi.py
+ ┣ 📂transaction
+ ┃ ┣ 📜__init__.py
+ ┃ ┣ 📜admin.py
+ ┃ ┣ 📜app.py
+ ┃ ┣ 📂migrations
+ ┃ ┣ 📜models.py
+ ┃ ┣ 📜tests.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜views.py
+ ┣ 📂users
+ ┃ ┣ 📜__init__.py
+ ┃ ┣ 📜admin.py
+ ┃ ┣ 📜app.py
+ ┃ ┣ 📂migrations
+ ┃ ┣ 📜models.py
+ ┃ ┣ 📜tests.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜views.py
+ ┣ 📜README.md
+ ┣ 📜manage.py
+ ┗ 📜requirements.txt
+
+
+
 ## Reference
 이 프로젝트는 원티드x위코드 백엔드 프리온보딩 과제 일환으로 8에서 출제한 과제를 기반으로 만들었습니다.
