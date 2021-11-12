@@ -72,6 +72,9 @@
 
 ### 거래 내역 조회 api
 
+![스크린샷 2021-11-13 오전 12 50 21](https://user-images.githubusercontent.com/70747064/141508232-603d42c2-6c70-47b2-922c-44bfa7ac8834.png)
+
+
 ### 입금 api
 - 계좌 비밀번호 : 
 
