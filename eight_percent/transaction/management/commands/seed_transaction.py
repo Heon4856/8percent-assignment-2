@@ -23,19 +23,24 @@ application = get_wsgi_application()
 
 
 def dummy():
-    start_date = datetime.datetime(2013, 9, 20, 13, 00, tzinfo=timezone.utc)
+    for j in range(10):
+        start_date = datetime.datetime(2000, 9, 20, 13, 00, tzinfo=timezone.utc)
+        # id_front = int(start_date.strftime("%Y%m%d"))
 
-    for i in tqdm(range(1000)):
-        start_date = start_date + datetime.timedelta(days=20)
-        Transaction.objects.create(
-            amount=100,
-            created_at=start_date,
-            description="설명",
-            counterparty="수신,발신",
-            balance= 300,
-            account_id=2,
-            transaction_type_id= 2
-        )
+        for i in tqdm(range(10000000)):
+            start_date = start_date + datetime.timedelta(days=1)
+
+            Transaction.objects.create(
+                amount=100,
+                created_at=start_date,
+                description="설명",
+                counterparty="수신,발신",
+                balance= 300,
+                account_id=randint(1,2),
+                transaction_type_id= randint(1,2)
+            )
+
+
 
 if __name__ == "__main__":
     dummy()
