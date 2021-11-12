@@ -63,8 +63,6 @@ class CreateAccountView(View):
                 return JsonResponse({'message': 'ENTER_YOUR_PASSWORD'}, status=400)
 
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
-            # hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
-            print(hashed_password)
             Account.objects.create(
                 user     = user,
                 password = hashed_password,
