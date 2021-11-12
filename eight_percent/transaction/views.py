@@ -4,6 +4,7 @@ from random import randrange
 import json
 import jwt
 import bcrypt
+from datetime import date, timedelta
 
 from django.views import View
 from django.http import JsonResponse
@@ -21,11 +22,11 @@ class TransactionHistoryView(View):
         account_number = data['account_number']
         transaction_type = data['transaction_type']
         start_date = data['start_date']
-        end_date = data['end_date']
+        end_date = date.fromisoformat(data['end_date']) + timedelta(days=1)
 
         transaction = Transaction.objects.filter(
             Q(account_id=account_number) & Q(transaction_type=transaction_type) & Q(
-                created_at__range=[str(start_date), str(end_date)])).order_by('created_at')
+                created_at__range=[start_date, end_date])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         print(len(paginated_transaction))
         result = [{
