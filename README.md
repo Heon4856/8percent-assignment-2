@@ -71,28 +71,35 @@
 
 
 ### 거래 내역 조회 api
+- 거래내역 조회 : 특정 계좌의 입금, 출금, 입출금을 지정 후 지정한 날짜에 거래내역을 조회
+![스크린샷 2021-11-13 오전 12 50 21](https://user-images.githubusercontent.com/67960152/141495496-b1d2e529-ff4a-460c-9e04-dbaac2f520ec.png)
 
 ### 입금 api
-- 계좌 비밀번호 : 
+- 계좌 비밀번호 : 새로운 계좌 생성
 
 <img width="707" alt="스크린샷 2021-11-12 오후 9 48 16" src="https://user-images.githubusercontent.com/70747064/141473158-a594f34e-b201-46bb-9524-e40a04923d74.png">
 
-- 계좌 조회 : 
+- 계좌 조회 : 유저가 가지고 있는 계좌번호만 조회
 
 <img width="696" alt="스크린샷 2021-11-12 오후 9 48 48" src="https://user-images.githubusercontent.com/70747064/141473221-9ad32f07-cdd6-470f-a990-4efc485d747c.png">
 
-- 입금 : 
+- 입금 : 입금 api, 입금 후 금액 리턴
 
 <img width="836" alt="스크린샷 2021-11-12 오후 10 11 51" src="https://user-images.githubusercontent.com/70747064/141473299-d94076b8-a425-45df-b04f-34ccc9bd9f9e.png">
 
 ### 출금 api
 
-- 출금 : 
+- 출금 : 출금 api, 출금 후 금액 리턴
 
 <img width="819" alt="스크린샷 2021-11-12 오후 10 12 14" src="https://user-images.githubusercontent.com/70747064/141473342-72a01081-f2ee-4f1a-8d57-0c835b4c7458.png">
 
 
 ## 폴더 구조
+
+![스크린샷 2021-11-13 오전 12 45 21](https://user-images.githubusercontent.com/67960152/141494342-7a642f6d-4f97-43b0-b4cd-385d12a3d191.png)
+
+
+## 배포 도커 실행방법
 
 ## Reference
 이 프로젝트는 원티드x위코드 백엔드 프리온보딩 과제 일환으로 8에서 출제한 과제를 기반으로 만들었습니다.
