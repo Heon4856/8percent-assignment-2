@@ -48,6 +48,20 @@ https://www.postman.com/binooooo/workspace/1aa44ed7-4d2d-4563-ae5d-c1df4ba97e72/
 (상세 설명 생략)
 
 ---
+## 기술적 고려사항
+1. 잔액의 무결성 보장  
+    transaction-atomic사용  
+    
+2. 1억건 데이터일 경우  
+    1) 인덱스 설정
+    2) pk를 yyyymmdd*1000000000 + (transaction데이터의 pk%1000000000)+1 로 설정하였음.
+이를 통해 기간을 통한 검색을 효율화하였음.
+실제로 100만건의 데이터로 실험한 결과 
+0.55초 --> 0.4초대로 낮출수 있었음
+<img width="495" alt="스크린샷 2021-11-13 오전 3 23 55" src="https://user-images.githubusercontent.com/13060192/141516264-7d50745a-36eb-435a-8553-36a1346fcf10.png">
+
+<img width="523" alt="스크린샷 2021-11-12 오후 8 25 01" src="https://user-images.githubusercontent.com/13060192/141516279-f35ab718-cfba-4bad-865b-8222099e3554.png">
+
 
 ## 사용 기술 및 tools
 
