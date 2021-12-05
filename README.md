@@ -1,6 +1,5 @@
 # 8percent-assignment-2
 
-## 팀원 : 정성헌, 송빈호, 안다민
 ---
 ## 과제 출제 기업 정보
 - 기업명 : 8퍼센트
@@ -9,14 +8,6 @@
 
 ---
 
-## 필수 포함 사항
-- READ.ME 작성
-    - 프로젝트 빌드, 자세한 실행 방법 명시
-    - 구현 방법과 이유에 대한 간략한 설명
-    - 완료된 시스템이 배포된 서버의 주소
-    - Swagger나 Postman을 통한 API 테스트할때 필요한 상세 방법
-    - 해당 과제를 진행하면서 회고 내용 블로그 포스팅
-- Swagger나 Postman을 이용하여 API 테스트 가능하도록 구현
 
 **✔️ API 목록**
 
@@ -63,11 +54,6 @@ https://www.postman.com/binooooo/workspace/1aa44ed7-4d2d-4563-ae5d-c1df4ba97e72/
 <img width="523" alt="스크린샷 2021-11-12 오후 8 25 01" src="https://user-images.githubusercontent.com/13060192/141516279-f35ab718-cfba-4bad-865b-8222099e3554.png">
 
 
-## 사용 기술 및 tools
-
-> - Back-End :  <img src="https://img.shields.io/badge/Python 3.8-3776AB?style=for-the-badge&logo=Python&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Django 3.2-092E20?style=for-the-badge&logo=Django&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/sqlite-1b9e41?style=for-the-badge&logo=Sqlite&logoColor=white"/>
-> - Deploy : <img src="https://img.shields.io/badge/AWS_EC2-232F3E?style=for-the-badge&logo=Amazon&logoColor=white"/>
-> - ETC :  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=Github&logoColor=white"/>&nbsp;<img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white"/>
 
 ---
 
@@ -75,45 +61,6 @@ https://www.postman.com/binooooo/workspace/1aa44ed7-4d2d-4563-ae5d-c1df4ba97e72/
 <img width="787" alt="스크린샷 2021-11-11 오후 6 11 51" src="https://user-images.githubusercontent.com/70747064/141466644-eb3982f9-3aa9-40dd-9129-e837fbc2e051.png">
 
 ---
-
-## 구현기능 및 테스트
-
-### 회원가입 및 로그인
-- 회원가입시 password 같은 민감정보는 단방향 해쉬 알고리즘인 bcrypt를 이용해서 암호화 하여 database에 저장
-- 로그인이 성공적으로 완료되면, user정보를 토큰으로 반환할때, 양방향 해쉬 알고리즘인 JWT를 사용해서 응답
-- 포스트맨 예시
-
-![스크린샷 2021-11-12 오후 9 34 41](https://user-images.githubusercontent.com/70747064/141468099-625429d1-2647-4bb4-b63d-929525cc4334.png)
-
-
-
-### 거래 내역 조회 api
-- 거래내역 조회 : 특정 계좌의 입금, 출금, 입출금을 지정 후 지정한 날짜에 거래내역을 조회
-![스크린샷 2021-11-13 오전 12 50 21](https://user-images.githubusercontent.com/67960152/141495496-b1d2e529-ff4a-460c-9e04-dbaac2f520ec.png)
-
-### 입금 api
-- 계좌 비밀번호 : 새로운 계좌 생성
-
-<img width="707" alt="스크린샷 2021-11-12 오후 9 48 16" src="https://user-images.githubusercontent.com/70747064/141473158-a594f34e-b201-46bb-9524-e40a04923d74.png">
-
-- 계좌 조회 : 유저가 가지고 있는 계좌번호만 조회
-
-<img width="696" alt="스크린샷 2021-11-12 오후 9 48 48" src="https://user-images.githubusercontent.com/70747064/141473221-9ad32f07-cdd6-470f-a990-4efc485d747c.png">
-
-- 입금 : 입금 api, 입금 후 금액 리턴
-
-<img width="836" alt="스크린샷 2021-11-12 오후 10 11 51" src="https://user-images.githubusercontent.com/70747064/141473299-d94076b8-a425-45df-b04f-34ccc9bd9f9e.png">
-
-### 출금 api
-
-- 출금 : 출금 api, 출금 후 금액 리턴
-
-<img width="819" alt="스크린샷 2021-11-12 오후 10 12 14" src="https://user-images.githubusercontent.com/70747064/141473342-72a01081-f2ee-4f1a-8d57-0c835b4c7458.png">
-
-
-## 폴더 구조
-
-![스크린샷 2021-11-13 오전 12 45 21](https://user-images.githubusercontent.com/67960152/141494342-7a642f6d-4f97-43b0-b4cd-385d12a3d191.png)
 
 
 ## 배포 도커 실행방법
