@@ -92,7 +92,7 @@ class TransactionView(View):
             hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
             print(hashed_account_number)
             # hash_account_number = bcrypt.checkpw(account_number.encode('utf-8'))
-            account = Account.objects.get(user=user, account_number=account_number)
+            account = Account.objects.select_for_update().get(user=user, account_number=account_number)
 
             if not account_number:
                 return JsonResponse({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'}, status=400)
