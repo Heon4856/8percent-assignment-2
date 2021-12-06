@@ -5,7 +5,7 @@ from jwt.exceptions import InvalidSignatureError, DecodeError
 from django.http import JsonResponse
 
 from users.models import Users
-from eight_percent.settings import SECRET_KEY, HASHING_ALGORITHM
+from my_settings import SECRET_KEY, HASHING_ALGORITHM
 
 
 def auth_check(func):
@@ -14,7 +14,7 @@ def auth_check(func):
             token = request.headers.get('Authorization')
             if not token:
                 return JsonResponse({'message': 'TOKEN_DOES_NOT_EXIST'}, status=400)
-
+            token = token.split()[1]
             decoded_auth_token = jwt.decode(token, SECRET_KEY, algorithms=HASHING_ALGORITHM)
             user_id = decoded_auth_token['user_id']
             user = Users.objects.get(id=user_id)

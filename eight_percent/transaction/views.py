@@ -1,60 +1,74 @@
-from json           import JSONDecodeError
-from random         import randrange
+from json import JSONDecodeError
+from random import randrange
 
 import json
 import jwt
 import bcrypt
+from datetime import date, timedelta
+import time
 
-from django.views   import View
-from django.http    import JsonResponse
-from django.db      import transaction
+from django.views import View
+from django.http import JsonResponse
+from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
 
-
-from .models import Account, Transaction,TransactionType
-
+from .models import Account, Transaction, TransactionType
+from utils.decorators import auth_check
 
 
 class TransactionHistoryView(View):
+    @auth_check
     def get(self, request):
         data = json.loads(request.body)
+        page = request.GET.get('page', 1)
+        user = request.user
         account_number = data['account_number']
         transaction_type = data['transaction_type']
-        start_date = data['start_date']
-        end_date = data['end_date']
+        start_date = date.fromisoformat(data['start_date'])
+        end_date = date.fromisoformat(data['end_date']) + timedelta(days=1)
+        t0 = time.time()
+
+        start_id = int(start_date.strftime("%Y%m%d")) * 1000000000
+        end_id = int(end_date.strftime("%Y%m%d")) * 1000000000
+        account_id = Account.objects.get(user=user, number=account_number)
 
         transaction = Transaction.objects.filter(
-            Q(account_id=account_number) & Q(transaction_type=transaction_type) & Q(
-                created_at__range=[str(start_date), str(end_date)])).order_by('created_at')
-        paginated_transaction = Paginator(transaction, 3).get_page(3)
-        for i in paginated_transaction:
-            print(i)
-        print(paginated_transaction)
-        return JsonResponse({'data': {'products': "mber", }}, status=200)
+            Q(account_id=account_id) & Q(transaction_type=transaction_type) & Q(
+                id__range=[start_id, end_id])).order_by('created_at')
+        paginated_transaction = Paginator(transaction, 10).get_page(page)
+        print(len(paginated_transaction))
+        result = [{
+            "transaction_date": transaction.created_at.strftime(r"%Y.%m.%d.%m.%s"),
+            "amount"          : transaction.amount,
+            "balance"         : transaction.balance,
+            "transaction_type": transaction.transaction_type.type,
+            "description"     : transaction.description
+        } for transaction in paginated_transaction]
 
+        t1 = time.time()
+        print(t1-t0)
+        return JsonResponse({'data': result}, status=200)
 
 
 class CreateAccountView(View):
     # 유저 계좌번호 생성
-    # @login_decorator
+    @auth_check
     def post(self, request, *args, **kwargs):
         try:
-            data           = json.loads(request.body)
-            user           = request.user
-            password       = data['password']
-            account_number = f'3333-{str(randrange(1,99)).zfill(2)}-{str(randrange(1,999999)).zfill(6)}'
+            data = json.loads(request.body)
+            user = request.user
+            password = data['password']
+            account_number = f'3333-{str(randrange(1, 99)).zfill(2)}-{str(randrange(1, 999999)).zfill(6)}'
 
             if not password:
                 return JsonResponse({'message': 'ENTER_YOUR_PASSWORD'}, status=400)
 
-            hashed_password       = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
-
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
             Account.objects.create(
                 user     = user,
                 password = hashed_password,
-                number   = hashed_account_number,
+                number   = account_number,
             )
             return JsonResponse({'message': 'SUCCESS'}, status=200)
 
@@ -62,31 +76,31 @@ class CreateAccountView(View):
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
 
 
-class LookupAccountView(View)
-    #유저가 가지고 있는 계좌번호만 조회
-    # @login_decorator
+class LookupAccountView(View):
+    # 유저가 가지고 있는 계좌번호만 조회
+    @auth_check
     def get(self, request, *args, **kwargs):
         try:
-            user         = request.user
-            accounts     = Account.objects.get(user_id = user)
-            account_list = [accounts.number for number in accounts]
-            return JsonResponse({'account_list': account_list}, status= 200)
+            user = request.user
+            accounts = Account.objects.filter(user_id=user)
+            account_list = [item.number for item in accounts]
+            return JsonResponse({'account_list': account_list}, status=200)
 
         except JSONDecodeError:
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
 
 
 class TransactionView(View):
-    # @login_decorator
+    @auth_check
     def post(self, request, *args, **kwargs):
         try:
-            data                = json.loads(request.body)
-            user                = request.user
-            account_number      = data['account_number']
-            account_password    = data['account_password']
-            amount              = data['amount']
-            description         = data['description']
-            counterparty        = data['counterparty']
+            data = json.loads(request.body)
+            user = request.user
+            account_number = data['account_number']
+            account_password = data['account_password']
+            amount = data['amount']
+            description = data['description']
+            counterparty = data['counterparty']
             transaction_type_id = data['transaction_type_id']
 
             hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
@@ -94,6 +108,9 @@ class TransactionView(View):
             # hash_account_number = bcrypt.checkpw(account_number.encode('utf-8'))
             account = Account.objects.select_for_update().get(user=user, account_number=account_number)
 
+
+            if not bcrypt.checkpw(account_password.encode('utf-8'), account.password.encode('utf-8')):
+                return JsonResponse({'message': 'INVALID_YOUR_PASSWORD'})
             if not account_number:
                 return JsonResponse({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'}, status=400)
             if not amount or amount < 0:
@@ -109,11 +126,11 @@ class TransactionView(View):
                 # transaction_type이 1일경우 입금
                 if transaction_type_id == 1:
                     Transaction.objects.create(
-                        amount              = amount,
-                        description         = description,
-                        counterparty        = counterparty,
-                        account_id          = account.id,
-                        transaction_type_id = 1
+                        amount=amount,
+                        description=description,
+                        counterparty=counterparty,
+                        account_id=account.id,
+                        transaction_type_id=1
                     )
                     account.balance = account.balance + amount
                     account.save()
@@ -123,23 +140,16 @@ class TransactionView(View):
                     if account.balance - amount < 0:
                         return JsonResponse({'message': 'INSUFFICIENT_IS_AMOUNT.'})
                     Transaction.objects.create(
-                        amount              = amount,
-                        description         = description,
-                        counterparty        = counterparty,
-                        account_id          = account.id,
-                        transaction_type_id = 2
+                        amount=amount,
+                        description=description,
+                        counterparty=counterparty,
+                        account_id=account.id,
+                        transaction_type_id=2
                     )
                     account.balance = account.balance - amount
                     account.save()
 
-                return JsonResponse({'message': 'SUCCESS'}, status=200)
+                return JsonResponse({'message': 'SUCCESS', "balance": account.balance}, status=200)
 
         except JSONDecodeError:
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
-
-
-
-
-
-
-
