@@ -70,7 +70,7 @@ class CreateAccountView(View):
                 password = hashed_password,
                 number   = account_number,
             )
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return JsonResponse({'message': 'SUCCESS', 'account_number' : f'{account_number}'}, status=201)
 
         except JSONDecodeError:
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
