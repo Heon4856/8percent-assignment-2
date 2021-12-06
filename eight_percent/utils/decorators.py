@@ -1,4 +1,3 @@
-import json
 import jwt
 from jwt.exceptions import InvalidSignatureError, DecodeError
 
