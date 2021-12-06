@@ -99,11 +99,11 @@ class TransactionView(View):
             counterparty = data['counterparty']
             transaction_type_id = data['transaction_type_id']
 
-            hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
+            hashed_account_number = bcrypt.hashpw(account_password.encode('utf-8'), bcrypt.gensalt())
             account = Account.objects.select_for_update().get( number=account_number)
 
 
-            if not bcrypt.checkpw(account_password.encode('utf-8'), account.password.encode('utf-8')):
+            if not bcrypt.checkpw(account_password.encode('utf-8'), hashed_account_number):
                 return JsonResponse({'message': 'INVALID_YOUR_PASSWORD'})
             if not account_number:
                 return JsonResponse({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'}, status=400)
