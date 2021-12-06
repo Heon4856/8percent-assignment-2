@@ -12,9 +12,14 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
+from users.authentications import BankingAuthentication
 from .models import Account, Transaction, TransactionType
 from utils.decorators import auth_check
+from .serializers import AccountSerializer
 
 
 class TransactionHistoryView(View):
@@ -72,18 +77,20 @@ class CreateAccountView(View):
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
 
 
-class LookupAccountView(View):
-    # 유저가 가지고 있는 계좌번호만 조회
-    @auth_check
-    def get(self, request, *args, **kwargs):
-        try:
-            user = request.user
-            accounts = Account.objects.filter(user_id=user)
-            account_list = [item.number for item in accounts]
-            return JsonResponse({'account_list': account_list}, status=200)
 
-        except JSONDecodeError:
-            return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
+class AccountViewSet(GenericViewSet):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    authentication_classes = [BankingAuthentication]
+
+
+    def list(self, request):
+        """
+        계좌 리스트 조회
+        GET /accounts/
+        """
+        accounts = Account.objects.filter(user=request.user).all()
+        return Response(self.get_serializer(accounts, many=True).data, status=status.HTTP_200_OK)
 
 
 class TransactionView(View):
