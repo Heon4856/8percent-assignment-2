@@ -18,7 +18,7 @@ class Account(models.Model):
 
 class TransactionType(models.Model):
     class TransactionTypeChoice(models.IntegerChoices):
-        DEPOSIT  = 1
+        DEPOSIT = 1
         WITHDRAW = 2
 
     type = models.PositiveSmallIntegerField(choices=TransactionTypeChoice.choices)
@@ -26,11 +26,13 @@ class TransactionType(models.Model):
     class Meta:
         db_table = 'transaction_types'
 
+
 def create_id():
     now = datetime.datetime.now()
     id_front = int(now.strftime("%Y%m%d")) * 1000000000
-    last_id=Transaction.objects.last().id
-    return id_front + (last_id +1)%1000000000
+    last_id = Transaction.objects.last().id
+    return id_front + (last_id + 1) % 1000000000
+
 
 class Transaction(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True, default=create_id)
@@ -42,12 +44,10 @@ class Transaction(models.Model):
     account = models.ForeignKey('Account', on_delete=models.CASCADE)
     transaction_type = models.ForeignKey('TransactionType', on_delete=models.CASCADE)
 
-
     class Meta:
         db_table = 'transactions'
         indexes = [
             models.Index(fields=['created_at', ]),
-            models.Index(fields=['account',]),
-            models.Index(fields=['transaction_type',])
+            models.Index(fields=['account', ]),
+            models.Index(fields=['transaction_type', ])
         ]
-
