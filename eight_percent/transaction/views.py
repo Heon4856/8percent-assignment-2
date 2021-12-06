@@ -12,9 +12,14 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
+from users.authentications import BankingAuthentication
 from .models import Account, Transaction, TransactionType
 from utils.decorators import auth_check
+from .serializers import AccountSerializer
 
 
 class TransactionHistoryView(View):
@@ -27,7 +32,6 @@ class TransactionHistoryView(View):
         transaction_type = data['transaction_type']
         start_date = date.fromisoformat(data['start_date'])
         end_date = date.fromisoformat(data['end_date']) + timedelta(days=1)
-        t0 = time.time()
 
         start_id = int(start_date.strftime("%Y%m%d")) * 1000000000
         end_id = int(end_date.strftime("%Y%m%d")) * 1000000000
@@ -37,7 +41,6 @@ class TransactionHistoryView(View):
             Q(account_id=account_id) & Q(transaction_type=transaction_type) & Q(
                 id__range=[start_id, end_id])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
-        print(len(paginated_transaction))
         result = [{
             "transaction_date": transaction.created_at.strftime(r"%Y.%m.%d.%m.%s"),
             "amount"          : transaction.amount,
@@ -46,8 +49,6 @@ class TransactionHistoryView(View):
             "description"     : transaction.description
         } for transaction in paginated_transaction]
 
-        t1 = time.time()
-        print(t1-t0)
         return JsonResponse({'data': result}, status=200)
 
 
@@ -70,24 +71,26 @@ class CreateAccountView(View):
                 password = hashed_password,
                 number   = account_number,
             )
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return JsonResponse({'message': 'SUCCESS', 'account_number' : f'{account_number}'}, status=201)
 
         except JSONDecodeError:
             return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
 
 
-class LookupAccountView(View):
-    # 유저가 가지고 있는 계좌번호만 조회
-    @auth_check
-    def get(self, request, *args, **kwargs):
-        try:
-            user = request.user
-            accounts = Account.objects.filter(user_id=user)
-            account_list = [item.number for item in accounts]
-            return JsonResponse({'account_list': account_list}, status=200)
 
-        except JSONDecodeError:
-            return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
+class AccountViewSet(GenericViewSet):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    authentication_classes = [BankingAuthentication]
+
+
+    def list(self, request):
+        """
+        계좌 리스트 조회
+        GET /accounts/
+        """
+        accounts = Account.objects.filter(user=request.user).all()
+        return Response(self.get_serializer(accounts, many=True).data, status=status.HTTP_200_OK)
 
 
 class TransactionView(View):
@@ -103,13 +106,11 @@ class TransactionView(View):
             counterparty = data['counterparty']
             transaction_type_id = data['transaction_type_id']
 
-            hashed_account_number = bcrypt.hashpw(account_number.encode('utf-8'), bcrypt.gensalt())
-            print(hashed_account_number)
-            # hash_account_number = bcrypt.checkpw(account_number.encode('utf-8'))
-            account = Account.objects.select_for_update().get(user=user, account_number=account_number)
+            hashed_account_number = bcrypt.hashpw(account_password.encode('utf-8'), bcrypt.gensalt())
+            account = Account.objects.select_for_update().get( number=account_number)
 
 
-            if not bcrypt.checkpw(account_password.encode('utf-8'), account.password.encode('utf-8')):
+            if not bcrypt.checkpw(account_password.encode('utf-8'), hashed_account_number):
                 return JsonResponse({'message': 'INVALID_YOUR_PASSWORD'})
             if not account_number:
                 return JsonResponse({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'}, status=400)
