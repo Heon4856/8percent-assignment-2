@@ -17,7 +17,11 @@ class Account(models.Model):
 
 
 class TransactionType(models.Model):
-    type = models.CharField(max_length=15)
+    class TransactionTypeChoice(models.IntegerChoices):
+        DEPOSIT  = 1
+        WITHDRAW = 2
+
+    type = models.PositiveSmallIntegerField(choices=TransactionTypeChoice.choices)
 
     class Meta:
         db_table = 'transaction_types'
