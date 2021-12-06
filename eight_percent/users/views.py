@@ -1,12 +1,10 @@
-import json
 import bcrypt
 import jwt
-import re
-from json import JSONDecodeError
-from rest_framework.generics import CreateAPIView
 
-from django.views import View
-from django.http  import JsonResponse
+from rest_framework import status
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Users
 from my_settings import SECRET_KEY, HASHING_ALGORITHM
@@ -18,20 +16,12 @@ class SignUpView(CreateAPIView):
     serializer_class = UserSerializer
 
 
-
-class LoginView(View):
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            user = Users.objects.get(name=data['name'])
-            password = data['password']
-
-            if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-                token = jwt.encode({'user_id': user.id}, SECRET_KEY, algorithm=HASHING_ALGORITHM)
-                return JsonResponse({'token': token, 'message': 'SUCCESS'}, status=200)
-            return JsonResponse({'message': 'INVALID_USER'}, status=401)
-        except KeyError:
-            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
-        except Users.DoesNotExist:
-            return JsonResponse({'message': 'USER_DOES_NOT_EXIST'}, status=401)
-
+class SignInView(APIView):
+    def post(self, request, format=None):
+        user = Users.objects.get(name=request.data['name'])
+        if not user:
+            return Response("존재하지 않는 이름입니다.", status=status.HTTP_401_UNAUTHORIZED)
+        if not bcrypt.checkpw(request.data["password"].encode('utf-8'), user.password.encode('utf-8')):
+            return Response(" 유효하지 않은 비밀번호 ", status=status.HTTP_401_UNAUTHORIZED)
+        token = "Bearer " + jwt.encode({'id': user.id}, SECRET_KEY, algorithm=HASHING_ALGORITHM)
+        return Response(token, status=status.HTTP_200_OK)
