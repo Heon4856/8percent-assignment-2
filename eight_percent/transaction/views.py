@@ -52,37 +52,31 @@ class TransactionHistoryView(View):
         return JsonResponse({'data': result}, status=200)
 
 
-class CreateAccountView(View):
-    # 유저 계좌번호 생성
-    @auth_check
-    def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-            user = request.user
-            password = data['password']
-            account_number = f'3333-{str(randrange(1, 99)).zfill(2)}-{str(randrange(1, 999999)).zfill(6)}'
-
-            if not password:
-                return JsonResponse({'message': 'ENTER_YOUR_PASSWORD'}, status=400)
-
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
-            Account.objects.create(
-                user     = user,
-                password = hashed_password,
-                number   = account_number,
-            )
-            return JsonResponse({'message': 'SUCCESS', 'account_number' : f'{account_number}'}, status=201)
-
-        except JSONDecodeError:
-            return JsonResponse({'message': 'BAD_REQUEST'}, status=400)
-
-
-
 class AccountViewSet(GenericViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     authentication_classes = [BankingAuthentication]
 
+    def create(self, request):
+        """
+        계좌생성
+        POST /accounts/
+        data params
+        - password
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        password = request.data.get('password')
+        account_number = f'3333-{str(randrange(1, 99)).zfill(2)}-{str(randrange(1, 999999)).zfill(6)}'
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
+
+        account = Account.objects.create(
+            user   = request.user,
+            password=hashed_password,
+            number=account_number,
+        )
+        return Response(self.get_serializer(account).data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
         """
@@ -91,6 +85,8 @@ class AccountViewSet(GenericViewSet):
         """
         accounts = Account.objects.filter(user=request.user).all()
         return Response(self.get_serializer(accounts, many=True).data, status=status.HTTP_200_OK)
+
+
 
 
 class TransactionView(View):
