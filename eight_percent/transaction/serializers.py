@@ -1,6 +1,6 @@
 import bcrypt
 from django.db import transaction
-from rest_framework.fields import CharField, IntegerField
+from rest_framework.fields import CharField, IntegerField, DateField
 from rest_framework.serializers import ModelSerializer, Serializer, Field
 
 from .exceptions import BadRequestException
@@ -72,3 +72,26 @@ class TransactionModelSerializer(ModelSerializer):
         model = Transaction
         fields = ["account_number", "amount", "created_at", "description", "counterparty", "balance", "transaction_type"]
 
+
+
+
+class TransactionListSerializer(Serializer):
+    account_number = CharField()
+    account_password = CharField()
+    transaction_type = IntegerField()
+    start_date = DateField()
+    end_date = DateField()
+
+    def validate(self, data):
+        if not data["account_number"]:
+            raise BadRequestException({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'})
+        if data["start_date"] > data["end_date"]:
+            raise BadRequestException({'message': '알맞은 날짜를 입력하세요.'})
+
+        if not data["account_password"]:
+            raise BadRequestException({'message': 'INVALID_YOUR_ACCOUNT_NUMBER'})
+        return data
+
+
+class TransactionListResponseSerializer(Serializer):
+    transaction = TransactionModelSerializer(many=True)
