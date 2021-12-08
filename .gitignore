@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-my_settings.py
+eight_percent/my_settings.py
 # C extensions
 *.so
 
@@ -387,3 +387,4 @@ fabric.properties
 .idea/codestream.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm
+/eight_percent/transaction/management/

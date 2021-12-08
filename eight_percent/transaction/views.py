@@ -1,13 +1,7 @@
-from json import JSONDecodeError
 from random import randrange
-
-import json
 import bcrypt
 from datetime import date, timedelta
 
-from django.views import View
-from django.http import JsonResponse
-from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework import status
@@ -15,9 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from users.authentications import BankingAuthentication
-from .exceptions import BadRequestException
-from .models import Account, Transaction, TransactionType
-from utils.decorators import auth_check
+from .models import Account, Transaction
 from .serializers import AccountSerializer, TransactionSerializer, TransactionModelSerializer, TransactionListSerializer
 
 
