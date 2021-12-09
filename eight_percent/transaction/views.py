@@ -74,13 +74,11 @@ class TransactionView(GenericViewSet):
         start_date = date.fromisoformat(serializer.data['start_date'])
         end_date = date.fromisoformat(serializer.data['end_date']) + timedelta(days=1)
 
-        start_id = int(start_date.strftime("%Y%m%d")) * 1000000000
-        end_id = int(end_date.strftime("%Y%m%d")) * 1000000000
         account = Account.objects.get(number=serializer.data["account_number"])
 
         transaction = Transaction.objects.filter(
             Q(account_id=account) & Q(transaction_type=serializer.data["transaction_type"]) & Q(
-                id__range=[start_id, end_id])).order_by('created_at')
+                created_at__range=[start_date, end_date])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         serializer = TransactionModelSerializer(paginated_transaction, many=True)
 
