@@ -7,7 +7,7 @@ from users.models import Users
 
 
 class Account(models.Model):
-    number = models.CharField(max_length=30)
+    number = models.CharField(max_length=20)
     password = models.CharField(max_length=100)
     balance = models.PositiveBigIntegerField()
     user = models.ForeignKey(Users, on_delete=models.PROTECT)
@@ -33,7 +33,7 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     description = models.CharField(max_length=7)
     counterparty = models.CharField(max_length=10)
-    balance = models.PositiveBigIntegerField()
+    balance = models.BigIntegerField()
     account = models.CharField(max_length=30)
     transaction_type = models.IntegerField()
 
