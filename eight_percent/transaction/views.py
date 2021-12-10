@@ -71,9 +71,13 @@ class TransactionView(GenericViewSet):
 
         with transaction.atomic():
             account = Account.objects.select_for_update().get(number=serializer.data.get('account_number'))
+            if account.user != request.user:
+                raise BadRequestException({'message': '계좌소유주가 아닙니다.'})
+
             if not bcrypt.checkpw(serializer.data.get('account_password').encode('utf-8'),
                                   account.password.encode('utf-8')):
                 raise BadRequestException({'message': '잘못된 비밀번호입니다.'})
+
 
             if serializer.data.get('transaction_type') == 1:
                 account.balance += serializer.data.get('amount')
@@ -98,6 +102,13 @@ class TransactionView(GenericViewSet):
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        account = Account.objects.get(number=serializer.data.get('account_number'))
+        if account.user != request.user:
+            raise BadRequestException({'message': '계좌소유주가 아닙니다.'})
+        if not bcrypt.checkpw(serializer.data.get('account_password').encode('utf-8'),
+                              account.password.encode('utf-8')):
+            raise BadRequestException({'message': '잘못된 비밀번호입니다.'})
 
         page = self.request.query_params.get("page", 1)
 
