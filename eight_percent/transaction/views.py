@@ -2,13 +2,15 @@ from random import randrange
 import bcrypt
 from datetime import date, timedelta
 
+from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from users.authentications import BankingAuthentication
+from .exceptions import BadRequestException
 from .models import Account, Transaction
 from .serializers import AccountSerializer, TransactionSerializer, TransactionModelSerializer, TransactionListSerializer
 
@@ -60,26 +62,51 @@ class TransactionView(GenericViewSet):
             return TransactionListSerializer
 
     def create(self, request):
+        """
+          입출금 api
+          POST /
+          """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        response = serializer.save()
-        return Response(TransactionModelSerializer(response).data, status=status.HTTP_201_CREATED)
+
+        with transaction.atomic():
+            account = Account.objects.select_for_update().get(number=serializer.data.get('account_number'))
+            if not bcrypt.checkpw(serializer.data.get('account_password').encode('utf-8'),
+                                  account.password.encode('utf-8')):
+                raise BadRequestException({'message': '잘못된 비밀번호입니다.'})
+
+            if serializer.data.get('transaction_type') == 1:
+                account.balance += serializer.data.get('amount')
+            if serializer.data.get('transaction_type') == 2:
+                account.balance -= serializer.data.get('amount')
+            account.save()
+            Transaction(amount=serializer.data.get('amount'),
+                        description=serializer.data.get('description'),
+                        counterparty=serializer.data.get('counterparty'),
+                        account=serializer.data.get('account_number'),
+                        transaction_type=serializer.data.get('transaction_type'),
+                        balance=account.balance).save()
+
+        return Response( f"transaction 성공하였습니다. {account.balance} 현재 잔액입니다.", status=status.HTTP_201_CREATED)
 
     def list(self, request):
+        """
+        거래내역 조회 api
+        GET /
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         page = self.request.query_params.get("page", 1)
 
-        start_date = date.fromisoformat(serializer.data['start_date'])
-        end_date = date.fromisoformat(serializer.data['end_date']) + timedelta(days=1)
+        start_date = date.fromisoformat(serializer.data.get('start_date'))
+        end_date = date.fromisoformat(serializer.data.get('end_date')) + timedelta(days=1)
 
-        account = Account.objects.get(number=serializer.data["account_number"])
+        account = Account.objects.get(number=serializer.data.get('account_number'))
 
         transaction = Transaction.objects.filter(
-            Q(account_id=account) & Q(transaction_type=serializer.data["transaction_type"]) & Q(
+            Q(account=account.number), Q(transaction_type=serializer.data.get('transaction_type')), Q(
                 created_at__range=[start_date, end_date])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         serializer = TransactionModelSerializer(paginated_transaction, many=True)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
