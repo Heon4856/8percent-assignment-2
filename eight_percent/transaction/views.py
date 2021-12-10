@@ -78,6 +78,8 @@ class TransactionView(GenericViewSet):
             if serializer.data.get('transaction_type') == 1:
                 account.balance += serializer.data.get('amount')
             if serializer.data.get('transaction_type') == 2:
+                if account.balance < serializer.data.get('amount'):
+                    raise BadRequestException({'message': '잔액보다 출금요청액이 많습니다.'})
                 account.balance -= serializer.data.get('amount')
             account.save()
             Transaction(amount=serializer.data.get('amount'),
