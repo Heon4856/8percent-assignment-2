@@ -2,6 +2,7 @@ from random import randrange
 import bcrypt
 from datetime import date, timedelta
 
+from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework import status
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from users.authentications import BankingAuthentication
+from .exceptions import BadRequestException
 from .models import Account, Transaction
 from .serializers import AccountSerializer, TransactionSerializer, TransactionModelSerializer, TransactionListSerializer
 
@@ -62,7 +64,25 @@ class TransactionView(GenericViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        response = serializer.save()
+        account = Account.objects.select_for_update().get(number=serializer.data['account_number'])
+
+        if not bcrypt.checkpw(serializer.data['account_password'].encode('utf-8'), account.password.encode('utf-8')):
+            raise BadRequestException({'message': '잘못된 비밀번호입니다.'})
+
+        with transaction.atomic():
+            if serializer.data["transaction_type"] == 1:
+                account.balance += serializer.data["amount"]
+            if serializer.data["transaction_type"] == 2:
+                account.balance -= serializer.data["amount"]
+            account.save()
+            return Transaction.objects.create(amount=serializer.data["amount"],
+                                              description=serializer.data["description"],
+                                              counterparty=serializer.data["counterparty"],
+                                              account_id=account.id,
+                                              transaction_type_id=serializer.data["transaction_type"],
+                                              balance=account.balance)
+
+
         return Response(TransactionModelSerializer(response).data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
