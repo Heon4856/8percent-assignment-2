@@ -62,6 +62,10 @@ class TransactionView(GenericViewSet):
             return TransactionListSerializer
 
     def create(self, request):
+        """
+          입출금 api
+          POST /
+          """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -86,6 +90,10 @@ class TransactionView(GenericViewSet):
         return Response( f"transaction 성공하였습니다. {account.balance} 현재 잔액입니다.", status=status.HTTP_201_CREATED)
 
     def list(self, request):
+        """
+        거래내역 조회 api
+        GET /
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
