@@ -1,5 +1,5 @@
 from rest_framework.fields import CharField, IntegerField, DateField
-from rest_framework.serializers import ModelSerializer, Serializer, Field
+from rest_framework.serializers import ModelSerializer, Serializer
 
 from .exceptions import BadRequestException
 from .models import Account, Transaction
@@ -30,15 +30,15 @@ class TransactionSerializer(Serializer):
     description = CharField()
 
     def validate(self, data):
-        if not data["account_number"]:
+        if not data.get('account_number'):
             raise BadRequestException({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'})
-        if not data["amount"]:
+        if not data.get('amount'):
             raise BadRequestException({'message': 'ENTER_YOUR_AMOUNT'})
-        if data["amount"] < 1:
+        if data.get('amount') < 1:
             raise BadRequestException({'message': '알맞은 숫자의 amount를 입력하세요.'})
-        if not data["counterparty"]:
+        if not data.get('counterparty'):
             raise BadRequestException({'message': 'ENTER_YOUR_COUNTERPARTY'})
-        if not data["account_password"]:
+        if not data.get('account_password'):
             raise BadRequestException({'message': 'INVALID_YOUR_ACCOUNT_NUMBER'})
         return data
 
@@ -60,12 +60,12 @@ class TransactionListSerializer(Serializer):
     end_date = DateField()
 
     def validate(self, data):
-        if not data["account_number"]:
+        if not data.get('account_number'):
             raise BadRequestException({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'})
-        if data["start_date"] > data["end_date"]:
+        if data.get('start_date') > data.get('end_date'):
             raise BadRequestException({'message': '알맞은 날짜를 입력하세요.'})
 
-        if not data["account_password"]:
+        if not data.get('account_password'):
             raise BadRequestException({'message': 'INVALID_YOUR_ACCOUNT_NUMBER'})
         return data
 

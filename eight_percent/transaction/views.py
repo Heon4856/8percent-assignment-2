@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from users.authentications import BankingAuthentication
 from .exceptions import BadRequestException
@@ -64,22 +64,22 @@ class TransactionView(GenericViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        account = Account.objects.select_for_update().get(number=serializer.data['account_number'])
+        account = Account.objects.select_for_update().get(number=serializer.data.get('account_number'))
 
-        if not bcrypt.checkpw(serializer.data['account_password'].encode('utf-8'), account.password.encode('utf-8')):
+        if not bcrypt.checkpw(serializer.data.get('password')['account_password'].encode('utf-8'), account.password.encode('utf-8')):
             raise BadRequestException({'message': '잘못된 비밀번호입니다.'})
 
         with transaction.atomic():
-            if serializer.data["transaction_type"] == 1:
-                account.balance += serializer.data["amount"]
-            if serializer.data["transaction_type"] == 2:
-                account.balance -= serializer.data["amount"]
+            if serializer.data.get('transaction_type') == 1:
+                account.balance += serializer.data.get('amount')
+            if serializer.data.get('transaction_type') == 2:
+                account.balance -= serializer.data.get('amount')
             account.save()
-            return Transaction.objects.create(amount=serializer.data["amount"],
-                                              description=serializer.data["description"],
-                                              counterparty=serializer.data["counterparty"],
+            return Transaction.objects.create(amount=serializer.data.get('amount'),
+                                              description=serializer.data.get('description'),
+                                              counterparty=serializer.data.get('counterparty'),
                                               account_id=account.id,
-                                              transaction_type_id=serializer.data["transaction_type"],
+                                              transaction_type_id=serializer.data.get('transaction_type'),
                                               balance=account.balance)
 
 
@@ -91,13 +91,13 @@ class TransactionView(GenericViewSet):
 
         page = self.request.query_params.get("page", 1)
 
-        start_date = date.fromisoformat(serializer.data['start_date'])
-        end_date = date.fromisoformat(serializer.data['end_date']) + timedelta(days=1)
+        start_date = date.fromisoformat(serializer.data.get('start_date'))
+        end_date = date.fromisoformat(serializer.data.get('end_date')) + timedelta(days=1)
 
-        account = Account.objects.get(number=serializer.data["account_number"])
+        account = Account.objects.get(number=serializer.data.get('account_number'))
 
         transaction = Transaction.objects.filter(
-            Q(account_id=account), Q(transaction_type=serializer.data["transaction_type"]), Q(
+            Q(account_id=account), Q(transaction_type=serializer.data.get('transaction_type')), Q(
                 created_at__range=[start_date, end_date])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         serializer = TransactionModelSerializer(paginated_transaction, many=True)
