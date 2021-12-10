@@ -44,12 +44,10 @@ class TransactionSerializer(Serializer):
 
 
 class TransactionModelSerializer(ModelSerializer):
-    account_number = CharField(source='account.number')
 
     class Meta:
         model = Transaction
-        fields = ["account_number", "amount", "created_at", "description", "counterparty", "balance",
-                  "transaction_type"]
+        fields = [ "amount", "created_at", "description", "counterparty", "balance","transaction_type", "account"]
 
 
 class TransactionListSerializer(Serializer):
