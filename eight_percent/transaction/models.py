@@ -10,7 +10,7 @@ class Account(models.Model):
     number = models.CharField(max_length=30)
     password = models.CharField(max_length=100)
     balance = models.PositiveBigIntegerField()
-    user = models.ForeignKey(Users)
+    user = models.ForeignKey(Users, on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'accounts'
