@@ -77,7 +77,7 @@ class TransactionView(GenericViewSet):
         account = Account.objects.get(number=serializer.data["account_number"])
 
         transaction = Transaction.objects.filter(
-            Q(account_id=account) & Q(transaction_type=serializer.data["transaction_type"]) & Q(
+            Q(account_id=account), Q(transaction_type=serializer.data["transaction_type"]), Q(
                 created_at__range=[start_date, end_date])).order_by('created_at')
         paginated_transaction = Paginator(transaction, 10).get_page(page)
         serializer = TransactionModelSerializer(paginated_transaction, many=True)
