@@ -1,8 +1,9 @@
-import jwt
 from rest_framework import authentication
 
+import jwt
+
 from .models import Users
-from my_settings import SECRET_KEY, HASHING_ALGORITHM
+from ..my_settings import SECRET_KEY, HASHING_ALGORITHM
 
 class BankingAuthentication(authentication.TokenAuthentication):
     def authenticate(self, request):
