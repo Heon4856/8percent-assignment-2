@@ -16,11 +16,11 @@ class Account(models.Model):
 
 
 class TransactionType(models.Model):
-    class TransactionTypeChoice(models.IntegerChoices):
+    class TransactionTypeEnum(models.IntegerChoices):
         DEPOSIT = 1
         WITHDRAW = 2
 
-    type = models.PositiveSmallIntegerField(choices=TransactionTypeChoice.choices)
+    type = models.PositiveSmallIntegerField(choices=TransactionTypeEnum.choices)
 
     class Meta:
         db_table = 'transaction_types'
