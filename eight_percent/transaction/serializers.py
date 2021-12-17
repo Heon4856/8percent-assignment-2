@@ -1,4 +1,4 @@
-from rest_framework.fields import CharField, IntegerField, DateField
+from rest_framework.fields import CharField, DateField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
 
 from .exceptions import BadRequestException

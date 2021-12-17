@@ -1,13 +1,12 @@
+import bcrypt
+import jwt
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import bcrypt
-import jwt
-
+from ..my_settings import HASHING_ALGORITHM, SECRET_KEY
 from .models import Users
-from ..my_settings import SECRET_KEY, HASHING_ALGORITHM
 from .serializers import UserSerializer
 
 

@@ -1,7 +1,6 @@
+import architect
 from django.db import models
 from django.utils import timezone
-
-import architect
 
 from ..users.models import Users
 

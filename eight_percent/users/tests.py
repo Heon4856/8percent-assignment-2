@@ -1,6 +1,10 @@
-import json, bcrypt
-from django.test import TestCase, Client
+import json
+
+import bcrypt
+from django.test import Client, TestCase
+
 from users.models import Users
+
 
 class SignUpViewTest(TestCase):
     def test_signup_success(self):
