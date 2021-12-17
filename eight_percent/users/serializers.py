@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import Users
 import bcrypt
+from rest_framework import serializers
+
+from .models import Users
 
 
 class UserSerializer(serializers.ModelSerializer):
