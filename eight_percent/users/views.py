@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..my_settings import HASHING_ALGORITHM, SECRET_KEY
+from my_settings import HASHING_ALGORITHM, SECRET_KEY
 from .models import Users
 from .serializers import UserSerializer
 
@@ -13,6 +13,11 @@ from .serializers import UserSerializer
 class SignUpView(CreateAPIView):
     model = Users
     serializer_class = UserSerializer
+
+    def post(self,request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({'message': 'SUCCESS'}, status=status.HTTP_201_CREATED)
 
 
 class SignInView(APIView):
