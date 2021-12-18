@@ -6,11 +6,13 @@ from .models import Account, Transaction
 
 
 class AccountSerializer(ModelSerializer):
+    user_name = CharField(source='user.name', required=False)
+
     class Meta:
         model = Account
-        fields = ['password', 'number', 'balance', 'user']
-        extra_kwargs = {'password': {'write_only': True}}
-        read_only_fields = ['number', 'balance', 'user']
+        fields = ['password', 'number', 'balance', 'user_name']
+        extra_kwargs = {'password': {'write_only': True} }
+        read_only_fields = ['user_name', 'number', 'balance']
 
     def validate(self, data):
         password = data.get('password')
