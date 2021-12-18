@@ -6,11 +6,13 @@ from .models import Account, Transaction
 
 
 class AccountSerializer(ModelSerializer):
+    user_name = CharField(source='user.name', required=False)
+
     class Meta:
         model = Account
-        fields = ['password', 'number', 'balance', 'user']
-        extra_kwargs = {'password': {'write_only': True}}
-        read_only_fields = ['number', 'balance', 'user']
+        fields = ['password', 'number', 'balance', 'user_name']
+        extra_kwargs = {'password': {'write_only': True} }
+        read_only_fields = ['user_name', 'number', 'balance']
 
     def validate(self, data):
         password = data.get('password')
@@ -30,16 +32,8 @@ class TransactionSerializer(Serializer):
     description = CharField()
 
     def validate(self, data):
-        if not data.get('account_number'):
-            raise BadRequestException({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'})
-        if not data.get('amount'):
-            raise BadRequestException({'message': 'ENTER_YOUR_AMOUNT'})
         if data.get('amount') < 1:
             raise BadRequestException({'message': '알맞은 숫자의 amount를 입력하세요.'})
-        if not data.get('counterparty'):
-            raise BadRequestException({'message': 'ENTER_YOUR_COUNTERPARTY'})
-        if not data.get('account_password'):
-            raise BadRequestException({'message': 'INVALID_YOUR_ACCOUNT_NUMBER'})
         return data
 
 

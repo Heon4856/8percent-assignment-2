@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from ..users.authentications import BankingAuthentication
+from users.authentications import BankingAuthentication
 from .exceptions import BadRequestException
 from .models import Account, Transaction
 from .serializers import (AccountSerializer, TransactionListSerializer,
@@ -115,8 +115,6 @@ class TransactionView(GenericViewSet):
 
         start_date = date.fromisoformat(serializer.data.get('start_date'))
         end_date = date.fromisoformat(serializer.data.get('end_date')) + timedelta(days=1)
-
-        account = Account.objects.get(number=serializer.data.get('account_number'))
 
         transaction = Transaction.objects.filter(
             Q(account=account.number), Q(transaction_type=serializer.data.get('transaction_type')), Q(

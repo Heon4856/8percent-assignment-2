@@ -2,7 +2,7 @@ import architect
 from django.db import models
 from django.utils import timezone
 
-from ..users.models import Users
+from users.models import Users
 
 
 class Account(models.Model):
