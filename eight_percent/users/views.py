@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from my_settings import HASHING_ALGORITHM, SECRET_KEY
+from .exceptions import NotFoundException, WrongPasswordException
 from .models import Users
 from .serializers import UserSerializer
 
@@ -17,15 +18,19 @@ class SignUpView(CreateAPIView):
     def post(self,request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.create(serializer.validated_data)
         return Response({'message': 'SUCCESS'}, status=status.HTTP_201_CREATED)
 
 
 class SignInView(APIView):
-    def post(self, request, format=None):
-        user = Users.objects.get(name=request.data['name'])
-        if not user:
-            return Response("존재하지 않는 이름입니다.", status=status.HTTP_401_UNAUTHORIZED)
+    def post(self, request):
+
+        try:
+            user = Users.objects.get(name=request.data['name'])
+        except Exception:
+            raise NotFoundException("찾을 수 없는 이름입니다.")
         if not bcrypt.checkpw(request.data["password"].encode('utf-8'), user.password.encode('utf-8')):
-            return Response(" 유효하지 않은 비밀번호 ", status=status.HTTP_401_UNAUTHORIZED)
+            raise WrongPasswordException("유효하지 않은 비밀번호입니다.")
+
         token = "Bearer " + jwt.encode({'id': user.id}, SECRET_KEY, algorithm=HASHING_ALGORITHM)
         return Response(token, status=status.HTTP_200_OK)
