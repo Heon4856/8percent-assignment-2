@@ -116,8 +116,6 @@ class TransactionView(GenericViewSet):
         start_date = date.fromisoformat(serializer.data.get('start_date'))
         end_date = date.fromisoformat(serializer.data.get('end_date')) + timedelta(days=1)
 
-        account = Account.objects.get(number=serializer.data.get('account_number'))
-
         transaction = Transaction.objects.filter(
             Q(account=account.number), Q(transaction_type=serializer.data.get('transaction_type')), Q(
                 created_at__range=[start_date, end_date])).order_by('created_at')
