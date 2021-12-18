@@ -42,7 +42,7 @@ class SignUpViewTest(BaseTestCase):
         response = self.client.post("/users/signup", json.dumps(user), content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(),  {'name': ['Ensure this field has no more than 10 characters.']})
+        self.assertEqual(response.json(), {'name': ['Ensure this field has no more than 10 characters.']})
 
     def test_signup_without_name(self):
         user = {
@@ -64,7 +64,6 @@ class SignUpViewTest(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'password': ['This field is required.']})
 
-
     def test_signup_with_none_password(self):
         user = {
             "name"    : "peter",
@@ -75,3 +74,56 @@ class SignUpViewTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'password': ['This field may not be blank.']})
+
+    def test_signup_with_existed_name(self):
+        user = {
+            "name"    : "peter",
+            "password": "xkrureo020"
+        }
+
+        self.client.post("/users/signup", json.dumps(user), content_type="application/json")
+        response = self.client.post("/users/signup", json.dumps(user), content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), { "name": ["users with this name already exists."]})
+
+
+
+class LoginTest(BaseTestCase):
+    def setUp(self):
+        Users.objects.create(
+            name='elon4856',
+            password=bcrypt.hashpw('1234abcd!!!!'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        )
+        self.client = Client()
+
+    def tearDown(self):
+        Users.objects.all().delete()
+
+    def test_succecss_login(self):
+        user = {
+            'name'    : 'elon4856',
+            'password': '1234abcd!!!!'
+        }
+        response = self.client.post("/users/login", json.dumps(user), content_type='application/json')
+        self.assertIn('Bearer', response.json() )
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_with_not_found_name(self):
+        user = {
+            'name'    : 'aefafdva',
+            'password': '1234abcd!!!!!'
+        }
+        response = self.client.post("/users/login", json.dumps(user), content_type='application/json')
+        self.assertEqual(response.json(), {'detail': '찾을 수 없는 이름입니다.'})
+        self.assertEqual(response.status_code, 404)
+
+    def test_with_wrong_password(self):
+        user = {
+            'name'    : 'elon4856',
+            'password': 'wrong_password'
+        }
+        response = self.client.post("/users/login", json.dumps(user), content_type='application/json')
+        self.assertEqual(response.json(), {'detail': '유효하지 않은 비밀번호입니다.'})
+        self.assertEqual(response.status_code, 400)
