@@ -12,7 +12,8 @@ from users.models import Users
 from util.test import BaseTestCase
 
 
-class TransactionTest(BaseTestCase):
+class TransactionListTest(BaseTestCase):
+    """거래내역 갖고오기 test"""
     def setUp(self):
         self.valid_user = Users.objects.create(
             name='elon4856',
@@ -47,6 +48,7 @@ class TransactionTest(BaseTestCase):
         self.client.post("/transaction", transaction_data, format='json')
 
     def test_read_transaction_list_success(self):
+        """거래내역 리스트를 성공적으로 가져올 경우"""
         today = datetime.today().strftime("%Y-%m-%d")
         search_data = {
             'account_number'  : "1234-12-123456",

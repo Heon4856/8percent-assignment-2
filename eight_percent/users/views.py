@@ -13,10 +13,20 @@ from .serializers import UserSerializer
 
 
 class SignUpView(CreateAPIView):
+    """
+    회원가입 관련 view
+    """
     model = Users
     serializer_class = UserSerializer
 
-    def post(self,request: Request) -> Response:
+    def post(self, request: Request) -> Response:
+        """
+        회원가입 api
+        POST /users/signup
+        data params
+        - name
+        - password
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.create(serializer.validated_data)
@@ -24,7 +34,17 @@ class SignUpView(CreateAPIView):
 
 
 class SignInView(APIView):
+    """
+    로그인 관련 view
+    """
     def post(self, request: Request) -> Response:
+        """
+        로그인 api
+        POST /users/login
+        data params
+        - name
+        - password
+        """
         try:
             user = Users.objects.get(name=request.data['name'])
         except Exception:

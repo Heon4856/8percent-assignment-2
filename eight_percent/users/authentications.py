@@ -7,6 +7,7 @@ from .models import Users
 
 class BankingAuthentication(authentication.TokenAuthentication):
     def authenticate(self, request):
+        """access_token이 유효한지 체크하는 함수"""
         access_token = request.headers.get('Authorization')
         if access_token:
             try:

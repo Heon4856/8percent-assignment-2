@@ -58,6 +58,9 @@ class TransactionView(GenericViewSet):
     authentication_classes = [BankingAuthentication]
 
     def get_serializer_class(self):
+        """
+        함수에 따라 serializer 설정함.
+        """
         if self.action == 'create':
             return TransactionSerializer
         if self.action == 'list':
@@ -65,9 +68,16 @@ class TransactionView(GenericViewSet):
 
     def create(self, request: Request) -> Response:
         """
-          입출금 api
-          POST /
-          """
+        입출금 api
+        POST /
+        data params
+        - account_number
+        - account_password
+        - amount
+        - description
+        - counterparty
+        - transaction_type
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -101,6 +111,12 @@ class TransactionView(GenericViewSet):
         """
         거래내역 조회 api
         GET /
+        data params
+        - account_number
+        - account_password
+        - transaction_type
+        - start_date
+        - end_date
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

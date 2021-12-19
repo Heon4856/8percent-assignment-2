@@ -10,6 +10,8 @@ from util.test import BaseTestCase
 
 
 class AccountTest(BaseTestCase):
+    """계좌관련 api 테스트"""
+
     def setUp(self):
         self.valid_user = Users.objects.create(
             name='elon4856',
@@ -34,6 +36,8 @@ class AccountTest(BaseTestCase):
         self.client.credentials(HTTP_AUTHORIZATION=self.valid_token)
 
     def test_create_account_success(self):
+        """계좌개설을 성공했을 시"""
+
         account_password = {"password": "1234"}
 
         response = self.client.post("/transaction/account", account_password, format='json')
@@ -43,6 +47,8 @@ class AccountTest(BaseTestCase):
         self.assertIn('balance', response.json())
 
     def test_create_account_without_password(self):
+        """비밀번호 빈칸으로 계좌개설 요청 시"""
+
         account_password = {"password": ""}
 
         response = self.client.post("/transaction/account", account_password, format='json')
@@ -50,6 +56,8 @@ class AccountTest(BaseTestCase):
         self.assertEqual(response.json(), {"password": ["This field may not be blank."]})
 
     def test_create_account_without_token(self):
+        """token없이 계좌개설 요청 시"""
+
         account_password = {"password": "1234"}
         self.client.credentials(HTTP_AUTHORIZATION=False)
         response = self.client.post("/transaction/account", account_password, format='json')
@@ -57,6 +65,8 @@ class AccountTest(BaseTestCase):
         self.assertEqual(response.json(), {"detail": "No token"})
 
     def test_read_account_list_success(self):
+        """계좌 list 요청 성공 시"""
+
         response = self.client.get("/transaction/account")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [{"number": "1234-12-123456", "balance": 0, "user_name": "elon4856"}])
