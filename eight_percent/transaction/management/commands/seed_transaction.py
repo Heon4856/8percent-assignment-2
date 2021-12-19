@@ -1,22 +1,25 @@
-from django.core.wsgi import get_wsgi_application
 import os
+
+from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "eight_percent.settings")
 
 from random import randint
-from faker import Faker
-from django_seed import Seed
+
 import django
+from django_seed import Seed
+from faker import Faker
 
 django.setup()
 
-from users.models import Users
-from transaction.models import Account, Transaction, TransactionType
-from tqdm import tqdm
-from random import randrange
 import datetime
-from django.utils import timezone
+from random import randrange
 
+from django.utils import timezone
+from tqdm import tqdm
+
+from transaction.models import Account, Transaction, TransactionType
+from users.models import Users
 
 application = get_wsgi_application()
 

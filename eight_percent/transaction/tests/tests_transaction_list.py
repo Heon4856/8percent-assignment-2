@@ -3,10 +3,9 @@ from datetime import datetime
 
 import bcrypt
 import jwt
-
 from rest_framework.test import APIClient
 
-from my_settings import SECRET_KEY, HASHING_ALGORITHM
+from my_settings import HASHING_ALGORITHM, SECRET_KEY
 from transaction.models import Account
 from users.models import Users
 from util.test import BaseTestCase

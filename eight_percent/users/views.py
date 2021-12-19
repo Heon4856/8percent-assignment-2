@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from my_settings import HASHING_ALGORITHM, SECRET_KEY
+
 from .exceptions import NotFoundException, WrongPasswordException
 from .models import Users
 from .serializers import UserSerializer

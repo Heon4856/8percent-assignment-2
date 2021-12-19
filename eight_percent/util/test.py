@@ -1,5 +1,6 @@
 from django.db import connections
-from django.test import  TransactionTestCase
+from django.test import TransactionTestCase
+
 
 class BaseTestCase(TransactionTestCase):
 
