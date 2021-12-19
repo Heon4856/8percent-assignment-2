@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Q
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -21,7 +22,7 @@ class AccountViewSet(GenericViewSet):
     serializer_class = AccountSerializer
     authentication_classes = [BankingAuthentication]
 
-    def create(self, request):
+    def create(self, request: Request) -> Response:
         """
         계좌생성
         POST /accounts/
@@ -42,7 +43,7 @@ class AccountViewSet(GenericViewSet):
         )
         return Response(self.get_serializer(account).data, status=status.HTTP_201_CREATED)
 
-    def list(self, request):
+    def list(self, request: Request) -> Response:
         """
         계좌 리스트 조회
         GET /accounts/
@@ -62,7 +63,7 @@ class TransactionView(GenericViewSet):
         if self.action == 'list':
             return TransactionListSerializer
 
-    def create(self, request):
+    def create(self, request: Request) -> Response:
         """
           입출금 api
           POST /
@@ -96,7 +97,7 @@ class TransactionView(GenericViewSet):
 
         return Response( f"transaction 성공하였습니다. {account.balance} 현재 잔액입니다.", status=status.HTTP_201_CREATED)
 
-    def list(self, request):
+    def list(self, request: Request) -> Response:
         """
         거래내역 조회 api
         GET /

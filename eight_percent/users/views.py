@@ -2,6 +2,7 @@ import bcrypt
 import jwt
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,7 +16,7 @@ class SignUpView(CreateAPIView):
     model = Users
     serializer_class = UserSerializer
 
-    def post(self,request):
+    def post(self,request: Request) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.create(serializer.validated_data)
@@ -23,8 +24,7 @@ class SignUpView(CreateAPIView):
 
 
 class SignInView(APIView):
-    def post(self, request):
-
+    def post(self, request: Request) -> Response:
         try:
             user = Users.objects.get(name=request.data['name'])
         except Exception:

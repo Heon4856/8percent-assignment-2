@@ -14,7 +14,7 @@ class AccountSerializer(ModelSerializer):
         extra_kwargs = {'password': {'write_only': True} }
         read_only_fields = ['user_name', 'number', 'balance']
 
-    def validate(self, data):
+    def validate(self, data : dict) -> dict:
         password = data.get('password')
 
         if password is None:
@@ -31,7 +31,7 @@ class TransactionSerializer(Serializer):
     transaction_type = IntegerField()
     description = CharField()
 
-    def validate(self, data):
+    def validate(self, data :dict) -> dict:
         if data.get('amount') < 1:
             raise BadRequestException({'message': '알맞은 숫자의 amount를 입력하세요.'})
         return data
@@ -51,7 +51,7 @@ class TransactionListSerializer(Serializer):
     start_date = DateField()
     end_date = DateField()
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         if not data.get('account_number'):
             raise BadRequestException({'message': 'ENTER_YOUR_ACCOUNT_NUMBER'})
         if data.get('start_date') > data.get('end_date'):
