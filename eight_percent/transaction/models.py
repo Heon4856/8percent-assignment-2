@@ -6,6 +6,7 @@ from users.models import Users
 
 
 class Account(models.Model):
+    """계좌 스키마"""
     number = models.CharField(max_length=20)
     password = models.CharField(max_length=100)
     balance = models.PositiveBigIntegerField(default=0)
@@ -16,6 +17,7 @@ class Account(models.Model):
 
 
 class TransactionType(models.Model):
+    """거래 type 스키마"""
     class TransactionTypeEnum(models.IntegerChoices):
         DEPOSIT = 1
         WITHDRAW = 2
@@ -28,6 +30,7 @@ class TransactionType(models.Model):
 
 @architect.install('partition', type='range', subtype='date', constraint='month', column='created_at')
 class Transaction(models.Model):
+    """거래내역 스키마"""
     amount = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(default=timezone.now)
     description = models.CharField(max_length=7)
