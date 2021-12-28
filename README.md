@@ -87,11 +87,13 @@ aws-rds를 사용하여서 회복가능하도록 설정하였다.
 ---
 
 ## 보완할 점
- 입출금을 많이 하거나, transaction test 수를 많이 늘리면,  django.db.utils.OperationalError: (2006, '')
- 가 나고 있다.
+ 1. 입출금을 많이 하거나, transaction test 수를 많이 늘리면,  django.db.utils.OperationalError: (2006, '')
+ 가 나고 있다.  
  2006에러가 mysql server가 꺼졌다는 에러인것 같아서, https://aws.amazon.com/ko/premiumsupport/knowledge-center/rds-mysql-server-gone-away/
- 시키는대로 다해봤지만 아직 해결안되는중,
+ 시키는대로 다해봤지만 아직 해결안되는중,  
 
+2. django 스럽게 user 관리하기
+3. counterpart빼기. (입출금이지, 입금 송금이 아니므로,)
 
 ## Reference
 이 프로젝트는 원티드x위코드 백엔드 프리온보딩 과제 일환으로 8에서 출제한 과제를 기반으로 만들었습니다.
